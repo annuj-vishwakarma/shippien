@@ -6,6 +6,10 @@ import { ProductDetail } from './components/ProductDetail';
 import { ProductComparison } from './components/ProductComparison';
 import { Cart } from './components/Cart';
 import { BulkOrderModal } from './components/BulkOrderModal';
+import { ShippingPolicy } from './components/ShippingPolicy';
+import { ReturnRefund } from './components/ReturnRefund';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { WhatsAppModal } from './components/WhatsAppModal';
 import { PRODUCTS, CATEGORIES, BRANDS, Product } from './data/products';
 import { Filter, Truck, ShieldCheck, Headphones, CreditCard, ChevronRight, MessageCircle } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -20,13 +24,15 @@ export default function App() {
     const saved = localStorage.getItem('shippien-wishlist');
     return saved ? JSON.parse(saved) : [];
   });
-  const [currentView, setCurrentView] = useState<'home' | 'wishlist' | 'product' | 'compare' | 'about'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'wishlist' | 'product' | 'compare' | 'about' | 'shipping' | 'return' | 'privacy'>('home');
   const [comparisonItems, setComparisonItems] = useState<string[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [whatsAppAction, setWhatsAppAction] = useState<'track-order' | 'bulk-inquiries' | 'partner' | null>(null);
 
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter(p => {
@@ -376,6 +382,12 @@ export default function App() {
             onAddToCart={addToCart}
             onBack={() => setCurrentView('home')}
           />
+        ) : currentView === 'shipping' ? (
+          <ShippingPolicy onBack={() => setCurrentView('home')} />
+        ) : currentView === 'return' ? (
+          <ReturnRefund onBack={() => setCurrentView('home')} />
+        ) : currentView === 'privacy' ? (
+          <PrivacyPolicy onBack={() => setCurrentView('home')} />
         ) : selectedProduct ? (
           <ProductDetail 
             product={selectedProduct}
@@ -457,18 +469,18 @@ export default function App() {
               <h5 className="font-bold mb-6 uppercase tracking-widest text-xs text-orange-500">Quick Links</h5>
               <ul className="space-y-4 text-zinc-400 text-sm">
                 <li><button onClick={() => { setCurrentView('about'); window.scrollTo(0, 0); }} className="hover:text-white transition-colors">About Shippien</button></li>
-                <li><a href="#" className="hover:text-white transition-colors">Track Order</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Bulk Inquiries</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Partner with Us</a></li>
+                <li><button onClick={() => { setWhatsAppAction('track-order'); setIsWhatsAppModalOpen(true); }} className="hover:text-white transition-colors">Track Order</button></li>
+                <li><button onClick={() => { setWhatsAppAction('bulk-inquiries'); setIsWhatsAppModalOpen(true); }} className="hover:text-white transition-colors">Bulk Inquiries</button></li>
+                <li><button onClick={() => { setWhatsAppAction('partner'); setIsWhatsAppModalOpen(true); }} className="hover:text-white transition-colors">Partner with Us</button></li>
               </ul>
             </div>
 
             <div>
               <h5 className="font-bold mb-6 uppercase tracking-widest text-xs text-orange-500">Support</h5>
               <ul className="space-y-4 text-zinc-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Shipping Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Return & Refund</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><button onClick={() => { setCurrentView('shipping'); window.scrollTo(0, 0); }} className="hover:text-white transition-colors">Shipping Policy</button></li>
+                <li><button onClick={() => { setCurrentView('return'); window.scrollTo(0, 0); }} className="hover:text-white transition-colors">Return & Refund</button></li>
+                <li><button onClick={() => { setCurrentView('privacy'); window.scrollTo(0, 0); }} className="hover:text-white transition-colors">Privacy Policy</button></li>
                 <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
               </ul>
             </div>
@@ -509,6 +521,12 @@ export default function App() {
       <BulkOrderModal 
         isOpen={isBulkModalOpen} 
         onClose={() => setIsBulkModalOpen(false)} 
+      />
+
+      <WhatsAppModal 
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+        action={whatsAppAction}
       />
     </div>
   );
